@@ -93,6 +93,7 @@ import com.servicemesh.agility.sdk.cloud.msgs.StorageCreateRequest;
 import com.servicemesh.agility.sdk.cloud.msgs.StorageDeleteRequest;
 import com.servicemesh.agility.sdk.cloud.msgs.StorageDetachRequest;
 import com.servicemesh.agility.sdk.cloud.msgs.StorageDetachableRequest;
+import com.servicemesh.agility.sdk.cloud.msgs.StorageExpandRequest;
 import com.servicemesh.agility.sdk.cloud.msgs.StorageResponse;
 import com.servicemesh.agility.sdk.cloud.msgs.StorageSnapshotCreateRequest;
 import com.servicemesh.agility.sdk.cloud.msgs.StorageSnapshotDeleteRequest;
@@ -260,15 +261,20 @@ public abstract class CloudAdapter implements BundleActivator
     {
         return null;
     }
-    
+
     public ICloudAction getCloudActionOperations()
     {
-    		return null;
+        return null;
     }
-    
+
     public ICloudPing getCloudPingOperations()
     {
-    		return null;
+        return null;
+    }
+
+    public IStorageExt getStorageExtOperations()
+    {
+        return null;
     }
 
     /*
@@ -2290,7 +2296,7 @@ public abstract class CloudAdapter implements BundleActivator
                 }
             }
         });
-        
+
         //
         //  Cloud Action
         //
@@ -2341,6 +2347,37 @@ public abstract class CloudAdapter implements BundleActivator
                     else
                     {
                         CloudResponse response = new CloudResponse();
+                        response.setStatus(Status.COMPLETE);
+                        handler.onResponse(response);
+                        return null;
+                    }
+                }
+                finally
+                {
+                    Thread.currentThread().setContextClassLoader(cl);
+                }
+            }
+        });
+
+        //
+        //  Extend Storage
+        //
+        register(StorageExpandRequest.class, new Dispatch<StorageExpandRequest, StorageResponse>() {
+            @Override
+            public ICancellable execute(StorageExpandRequest request, ResponseHandler<StorageResponse> handler)
+            {
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                try
+                {
+                    IStorageExt operations = getStorageExtOperations();
+                    if (operations != null)
+                    {
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        return operations.extend(request, handler);
+                    }
+                    else
+                    {
+                        StorageResponse response = new StorageResponse();
                         response.setStatus(Status.COMPLETE);
                         handler.onResponse(response);
                         return null;

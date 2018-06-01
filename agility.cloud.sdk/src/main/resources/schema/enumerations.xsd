@@ -72,6 +72,7 @@ ALL SOFTWARE, INFORMATION AND ANY OTHER RELATED COMMUNICATIONS (COLLECTIVELY, "W
          <xsd:enumeration value="snapshotsPanelEnabled"/>
          <xsd:enumeration value="propertiesPanelEnabled"/>
          <xsd:enumeration value="cpuCoresPerSocketSupported"/>
+         <xsd:enumeration value="storageExpandSupported"/>
       </xsd:restriction>
    </xsd:simpleType>
       
