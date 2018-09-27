@@ -3,6 +3,7 @@ package com.servicemesh.agility.api.service;
 import java.util.Map;
 
 import com.servicemesh.agility.api.Task;
+import com.servicemesh.agility.api.Tasklist;
 
 public interface ITask
 {
@@ -16,5 +17,9 @@ public interface ITask
     public Task resume(Task task) throws Exception;
     
     public Task recover(Task task) throws Exception;
+
+    public Task recover(Task task) throws Exception;
+
+    public Tasklist getRunningTasks(boolean leafOnly) throws Exception;
 
 }
