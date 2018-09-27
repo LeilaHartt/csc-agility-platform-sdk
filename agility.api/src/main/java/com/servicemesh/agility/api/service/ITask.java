@@ -15,8 +15,6 @@ public interface ITask
     public Task cancel(Task task) throws Exception;
 
     public Task resume(Task task) throws Exception;
-    
-    public Task recover(Task task) throws Exception;
 
     public Task recover(Task task) throws Exception;
 
