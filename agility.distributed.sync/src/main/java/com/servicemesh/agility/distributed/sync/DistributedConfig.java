@@ -16,10 +16,12 @@ import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
 
+import com.servicemesh.agility.distributed.impl.AgilityWatcher;
+
 /**
  * Provides distributed configuration data.
  */
-public class DistributedConfig implements Watcher
+public class DistributedConfig
 {
 
     private final static Logger logger = Logger.getLogger(DistributedConfig.class);
@@ -79,7 +81,10 @@ public class DistributedConfig implements Watcher
                 }
 
                 logger.debug("Connecting to zookeeper at: " + url);
-                _zooKeeper = new ZooKeeper(url, Integer.parseInt(timeout), new DistributedConfig());
+                //  This watcher will provide a wait for the coller until we're officially connected to Zookeeper:
+                AgilityWatcher watcher = new AgilityWatcher();
+                _zooKeeper = new ZooKeeper(url, Integer.parseInt(timeout), watcher);
+                watcher.await();
                 bumpZkHeartbeatPriority();
             }
         }
@@ -156,8 +161,7 @@ public class DistributedConfig implements Watcher
      * @param watcher
      *            An implementation of the ZooKeeper Watcher interface to monitor data changes
      */
-    public static void create(ZooKeeper zk, String path, CreateMode mode, Watcher watcher)
-            throws Exception
+    public static void create(ZooKeeper zk, String path, CreateMode mode, Watcher watcher) throws Exception
     {
         ProtocolSupport ps = new ProtocolSupport(zk);
         StringBuilder sb = new StringBuilder();
@@ -351,7 +355,7 @@ public class DistributedConfig implements Watcher
         }
         catch (KeeperException.NoNodeException ex)
         {
-            children = new ArrayList<String>();
+            children = new ArrayList<>();
         }
         return children;
     }
@@ -363,7 +367,7 @@ public class DistributedConfig implements Watcher
     public static SortedSet<ZNodeName> getSortedChildren(String path) throws Exception
     {
         List<String> nodes = getChildren(path);
-        SortedSet<ZNodeName> sorted = new TreeSet<ZNodeName>();
+        SortedSet<ZNodeName> sorted = new TreeSet<>();
         for (String node : nodes)
         {
             sorted.add(new ZNodeName(node));
@@ -485,16 +489,6 @@ public class DistributedConfig implements Watcher
         catch (InterruptedException ex)
         {
         }
-    }
-
-    /**
-     * This class's no-op implementation of the ZooKeeper Watcher interface.
-     */
-    @Override
-    public void process(WatchedEvent event)
-    {
-        // TODO Auto-generated method stub
-
     }
 
 }
