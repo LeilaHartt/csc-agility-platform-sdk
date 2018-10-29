@@ -82,7 +82,7 @@ public class DistributedConfig
 
                 logger.debug("Connecting to zookeeper at: " + url);
                 //  This watcher will provide a wait for the coller until we're officially connected to Zookeeper:
-                AgilityWatcher watcher = new AgilityWatcher();
+                AgilityWatcher watcher = new AgilityWatcher(url);
                 _zooKeeper = new ZooKeeper(url, Integer.parseInt(timeout), watcher);
                 watcher.await();
                 bumpZkHeartbeatPriority();
@@ -93,6 +93,15 @@ public class DistributedConfig
             logger.error(ex.getMessage(), ex);
         }
         return _zooKeeper;
+    }
+
+    /*
+     * Provide a way to force re-initialization of Zookeeper when a disconnect is detected.  The code above
+     * needs to be executed again (we need another "new Zookeeper()" call to re-connect.
+     */
+    public static synchronized void clearZookeeper()
+    {
+        _zooKeeper = null;
     }
 
     /**
