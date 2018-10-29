@@ -47,6 +47,7 @@ public class AgilityWatcher implements Watcher
              * The client is in the disconnected state - it is not connected to any server in the ensemble.
              */
             logger.debug("Zookeeper state: Disconnected");
+            DistributedConfig.clearZookeeper(); //  Force a new connection
         }
         else if (event.getState() == KeeperState.SyncConnected)
         {
