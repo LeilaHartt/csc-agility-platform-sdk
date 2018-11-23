@@ -1,0 +1,3 @@
+/List of variables defined/a\
+    @JsonProperty("variables")\
+@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="__type")\
