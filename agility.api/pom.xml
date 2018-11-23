@@ -88,6 +88,10 @@
 									<arg value="-c" />
 									<arg value="sed -f ${sed.script.dir}/template -itmp ${xjc.generated.sources.dir}/com/servicemesh/agility/api/Template.java" />
 								</exec>
+                                                                <exec executable="/bin/sh">
+                                                                        <arg value="-c" />
+                                                                        <arg value="sed -f ${sed.script.dir}/templateVariables -itmp ${xjc.generated.sources.dir}/com/servicemesh/agility/api/Template.java" />
+                                                                </exec>
 								<exec executable="/bin/sh">
 									<arg value="-c" />
 									<arg value="sed -f ${sed.script.dir}/sedscript5 -itmp ${xjc.generated.sources.dir}/com/servicemesh/agility/api/PolicyAssignment.java" />
