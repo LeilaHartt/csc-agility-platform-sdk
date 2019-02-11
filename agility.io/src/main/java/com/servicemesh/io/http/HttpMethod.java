@@ -20,7 +20,7 @@ package com.servicemesh.io.http;
 public enum HttpMethod
 {
     OPTIONS(0, "OPTIONS"), GET(1, "GET"), HEAD(2, "HEAD"), POST(3, "POST"), PUT(4, "PUT"), DELETE(5, "DELETE"), TRACE(6, "TRACE"),
-    CONNECT(7, "CONNECT");
+    CONNECT(7, "CONNECT"), PATCH(8, "PATCH");
 
     final private int _id;
     final private String _name;
