@@ -1,0 +1,6 @@
+#!/bin/bash
+
+rm -rf xmlns
+cxsd http://localhost:8080/all.xsd
+
+echo "All done!"

@@ -22,6 +22,7 @@ REPRODUCTION OF WORKS NOT EXPRESSLY AUTHORIZED BY SERVICEMESH IS STRICTLY PROHIB
    xmlns:agility="http://servicemesh.com/agility/api">
 
    <xsd:include schemaLocation="link.xsd" />
+   <xsd:include schemaLocation="asset.xsd" />
 
    <xsd:complexType name="MgmtScriptGroup">
      <xsd:annotation>

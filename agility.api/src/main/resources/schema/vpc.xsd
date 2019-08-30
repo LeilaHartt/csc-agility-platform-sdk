@@ -13,6 +13,8 @@
    <xsd:include schemaLocation="network.xsd" />
    <xsd:include schemaLocation="infrastructure.xsd" />
     
+   <xsd:include schemaLocation="instance.xsd" />
+
    <xsd:complexType name="VPC">
       <xsd:annotation>
          <xsd:appinfo>
