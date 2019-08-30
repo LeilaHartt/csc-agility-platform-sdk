@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+COPYRIGHT (C) 2008-2012 SERVICEMESH, INC.  ALL RIGHTS RESERVED.  CONFIDENTIAL AND PROPRIETARY. 
+ 
+ALL SOFTWARE, INFORMATION AND ANY OTHER RELATED COMMUNICATIONS (COLLECTIVELY, "WORKS") ARE CONFIDENTIAL AND PROPRIETARY 
+INFORMATION THAT ARE THE EXCLUSIVE PROPERTY OF SERVICEMESH.     ALL WORKS ARE PROVIDED UNDER THE APPLICABLE AGREEMENT OR 
+END USER LICENSE AGREEMENT IN EFFECT BETWEEN YOU AND SERVICEMESH.  UNLESS OTHERWISE SPECIFIED IN THE APPLICABLE AGREEMENT, 
+ALL WORKS ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, 
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.  ALL USE, DISCLOSURE AND/OR 
+REPRODUCTION OF WORKS NOT EXPRESSLY AUTHORIZED BY SERVICEMESH IS STRICTLY PROHIBITED.
+-->
+
+<xsd:schema targetNamespace="http://servicemesh.com/agility/api"
+   xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="qualified"
+   xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0" jaxb:extensionBindingPrefixes="xjc annox"
+   xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+   xmlns:annox="http://annox.dev.java.net" 
+   xmlns:a="http://annox.dev.java.net/com.servicemesh.agility.tools.annotation"
+   xmlns:jl="http://annox.dev.java.net/java.lang"
+   xmlns:jxml="http://annox.dev.java.net/javax.xml.bind.annotation"
+   xmlns:agility="http://servicemesh.com/agility/api">
+
+     
+   <xsd:include schemaLocation="accessRight.xsd" />
+   <xsd:include schemaLocation="apiinfo.xsd" />
+   <xsd:include schemaLocation="asset.xsd" />
+   <xsd:include schemaLocation="assetProperty.xsd" />
+   <xsd:include schemaLocation="assetType.xsd" />
+   <xsd:include schemaLocation="atomicInteger.xsd" />
+   <xsd:include schemaLocation="attachment.xsd" />
+   <xsd:include schemaLocation="authGroup.xsd" />
+   <xsd:include schemaLocation="authentication.xsd" />
+   <xsd:include schemaLocation="blueprint.xsd" />
+   <xsd:include schemaLocation="cloud.xsd" />
+   <xsd:include schemaLocation="common.xsd" />
+   <xsd:include schemaLocation="configuration.xsd" />
+   <xsd:include schemaLocation="connectionDefinition.xsd" />
+   <xsd:include schemaLocation="container.xsd" />
+   <xsd:include schemaLocation="containerRights.xsd" />
+   <xsd:include schemaLocation="credential.xsd" />
+   <xsd:include schemaLocation="dashboards.xsd" />
+   <xsd:include schemaLocation="deployment.xsd" />
+   <xsd:include schemaLocation="design.xsd" />
+   <xsd:include schemaLocation="distributed.xsd" />
+   <xsd:include schemaLocation="enumerations.xsd" />
+   <xsd:include schemaLocation="envelope.xsd" />
+   <xsd:include schemaLocation="environment.xsd" />
+   <xsd:include schemaLocation="eula.xsd" />
+   <xsd:include schemaLocation="general.xsd" />
+   <xsd:include schemaLocation="global.xsd" />
+   <xsd:include schemaLocation="globalVariable.xsd" />
+   <xsd:include schemaLocation="hotswaplist.xsd" />
+   <xsd:include schemaLocation="image.xsd" />
+   <xsd:include schemaLocation="importAssetReport.xsd" />
+   <xsd:include schemaLocation="importFileReport.xsd" />
+   <xsd:include schemaLocation="importReport.xsd" />
+   <xsd:include schemaLocation="infrastructure.xsd" />
+   <xsd:include schemaLocation="instance.xsd" />
+   <xsd:include schemaLocation="item.xsd" />
+   <xsd:include schemaLocation="launchItem.xsd" />
+   <xsd:include schemaLocation="ldapGroup.xsd" />
+   <xsd:include schemaLocation="link.xsd" />
+   <xsd:include schemaLocation="methodDefinition.xsd" />
+   <xsd:include schemaLocation="mgmtScript.xsd" />
+   <xsd:include schemaLocation="model.xsd" />
+   <xsd:include schemaLocation="network.xsd" />
+   <xsd:include schemaLocation="onboard.xsd" />
+   <xsd:include schemaLocation="package.xsd" />
+   <xsd:include schemaLocation="planner.xsd" />
+   <xsd:include schemaLocation="policy.xsd" />
+   <xsd:include schemaLocation="policyAssignment.xsd" />
+   <xsd:include schemaLocation="policyMeta.xsd" />
+   <xsd:include schemaLocation="priceEngine.xsd" />
+   <xsd:include schemaLocation="project.xsd" />
+   <xsd:include schemaLocation="property.xsd" />
+   <xsd:include schemaLocation="propertyDefinition.xsd" />
+   <xsd:include schemaLocation="propertyType.xsd" />
+   <xsd:include schemaLocation="protocol.xsd" />
+   <xsd:include schemaLocation="proxy.xsd" />
+   <xsd:include schemaLocation="releaseManager.xsd" />
+   <xsd:include schemaLocation="repository.xsd" />
+   <xsd:include schemaLocation="resource.xsd" />
+   <xsd:include schemaLocation="script.xsd" />
+   <xsd:include schemaLocation="scriptvariable.xsd" />
+   <xsd:include schemaLocation="service.xsd" />
+   <xsd:include schemaLocation="smList.xsd" />
+   <xsd:include schemaLocation="snapshot.xsd" />
+   <xsd:include schemaLocation="stack.xsd" />
+   <xsd:include schemaLocation="storage.xsd" />
+   <xsd:include schemaLocation="store.xsd" />
+   <xsd:include schemaLocation="task.xsd" />
+   <xsd:include schemaLocation="taxonomy.xsd" />
+   <xsd:include schemaLocation="template.xsd" />
+   <xsd:include schemaLocation="topology.xsd" />
+   <xsd:include schemaLocation="user.xsd" />
+   <xsd:include schemaLocation="validators.xsd" />
+   <xsd:include schemaLocation="valueprovider.xsd" />
+   <xsd:include schemaLocation="volume.xsd" />
+   <xsd:include schemaLocation="vpc.xsd" />
+   <xsd:include schemaLocation="workflow.xsd" />
+   <xsd:include schemaLocation="workload.xsd" />
+
+</xsd:schema>

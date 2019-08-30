@@ -21,6 +21,9 @@ REPRODUCTION OF WORKS NOT EXPRESSLY AUTHORIZED BY SERVICEMESH IS STRICTLY PROHIB
    xmlns:jxml="http://annox.dev.java.net/javax.xml.bind.annotation"
    xmlns:agility="http://servicemesh.com/agility/api">
 
+   <xsd:include schemaLocation="asset.xsd" />
+   <xsd:include schemaLocation="enumerations.xsd" />
+
    <xsd:complexType name="DistNode">
    
       <xsd:annotation>
