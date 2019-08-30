@@ -648,7 +648,7 @@ REPRODUCTION OF WORKS NOT EXPRESSLY AUTHORIZED BY SERVICEMESH IS STRICTLY PROHIB
                   </xsd:annotation>
                </xsd:element>
                
-               <xsd:element name="cloudFiirewallSupported" type="xsd:boolean" minOccurs="0">
+               <xsd:element name="cloudFirewallSupported" type="xsd:boolean" minOccurs="0">
                   <xsd:annotation>
                      <xsd:appinfo>
                         <annox:annotate target="field">
@@ -658,7 +658,7 @@ REPRODUCTION OF WORKS NOT EXPRESSLY AUTHORIZED BY SERVICEMESH IS STRICTLY PROHIB
                   </xsd:annotation>
                </xsd:element>
                
-               <xsd:element name="storeSyncLimited" type="xsd:boolean" minOccurs="0">
+               <xsd:element name="storeageSyncLimited" type="xsd:boolean" minOccurs="0">
                   <xsd:annotation>
                      <xsd:appinfo>
                         <annox:annotate target="field">
