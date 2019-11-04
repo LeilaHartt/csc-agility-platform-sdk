@@ -28,6 +28,7 @@ REPRODUCTION OF WORKS NOT EXPRESSLY AUTHORIZED BY SERVICEMESH IS STRICTLY PROHIB
    <xsd:include schemaLocation="priceEngine.xsd" />
    <xsd:include schemaLocation="repository.xsd" />
    <xsd:include schemaLocation="network.xsd" />
+   <xsd:include schemaLocation="infrastructure.xsd" />
    
    <xsd:complexType name="Cloud">
    
@@ -326,7 +327,17 @@ REPRODUCTION OF WORKS NOT EXPRESSLY AUTHORIZED BY SERVICEMESH IS STRICTLY PROHIB
                      </xsd:appinfo>
                   </xsd:annotation>
                </xsd:element>
-
+               
+               <xsd:element name="vpcs" type="agility:Link" minOccurs="0" maxOccurs="unbounded">
+                  <xsd:annotation>
+                     <xsd:appinfo>
+                        <annox:annotate target="field">
+                           <a:ApiField comment="Reference to list of VPCs associated with this cloud." />
+                        </annox:annotate>
+                     </xsd:appinfo>
+                  </xsd:annotation>
+               </xsd:element>
+               
             </xsd:sequence>
          </xsd:extension>
       </xsd:complexContent>
