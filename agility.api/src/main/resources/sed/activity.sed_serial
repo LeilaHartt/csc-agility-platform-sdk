@@ -1,0 +1,2 @@
+s/public class \([a-zA-Z][a-zA-Z0-9_]*\) {$/public class \1 implements java.io.Serializable {/
+s/extends \([a-zA-Z][a-zA-Z0-9_]*\)$/extends \1 implements java.io.Serializable/

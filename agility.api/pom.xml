@@ -219,9 +219,25 @@
 									<arg value="sed -f ${sed.script.dir}/fieldvalidator -itmp ${xjc.generated.sources.dir}/com/servicemesh/agility/api/FieldValidator.java" />
 								</exec>
 								<!-- End of JsonTypeInfo -->
+								
+								<!-- Activity -->
+								<exec executable="/bin/sh">
+									<arg value="-c" />
+									<arg value="sed -f ${sed.script.dir}/activity.sedscript -itmp ${xjc.generated.sources.dir}/com/servicemesh/agility/api/activity/ActivitySource.java" />
+								</exec>
+								<exec executable="/bin/sh">
+									<arg value="-c" />
+									<arg value="sed -f ${sed.script.dir}/activity.public -itmp ${xjc.generated.sources.dir}/com/servicemesh/agility/api/activity/*.java" />
+								</exec>
+								<exec executable="/bin/sh">
+									<arg value="-c" />
+									<arg value="sed -f ${sed.script.dir}/activity.serial -itmp ${xjc.generated.sources.dir}/com/servicemesh/agility/api/activity/*.java" />
+								</exec>
+								<!--  End of Activity -->
 
 								<delete>
 									<fileset dir="${xjc.generated.sources.dir}/com/servicemesh/agility/api/" includes="*.javatmp" />
+									<fileset dir="${xjc.generated.sources.dir}/com/servicemesh/agility/api/activity" includes="*.javatmp" />
 								</delete>
 							</target>
 						</configuration>
@@ -316,7 +332,7 @@
                             </Import-Package>
                             <Bundle-ClassPath>.</Bundle-ClassPath>
                             <Export-Package>
-                                com.servicemesh.agility.api;version="${project.version}",com.servicemesh.agility.api.service;version="${project.version}",com.servicemesh.agility.annotation;version="${project.version}"
+                                com.servicemesh.agility.api;version="${project.version}",com.servicemesh.agility.api.service;version="${project.version}",com.servicemesh.agility.annotation;version="${project.version}",com.servicemesh.agility.api.activity;version="${project.version}",com.servicemesh.agility.api.activity.service;version="${project.version}"
                             </Export-Package>
 							<Agility-Bundle-Type>
 								agility-core
