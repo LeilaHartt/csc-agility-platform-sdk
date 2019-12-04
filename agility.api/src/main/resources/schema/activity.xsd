@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+COPYRIGHT (C) 2008-2012 SERVICEMESH, INC.  ALL RIGHTS RESERVED.  CONFIDENTIAL AND PROPRIETARY. 
+ 
+ALL SOFTWARE, INFORMATION AND ANY OTHER RELATED COMMUNICATIONS (COLLECTIVELY, "WORKS") ARE CONFIDENTIAL AND PROPRIETARY 
+INFORMATION THAT ARE THE EXCLUSIVE PROPERTY OF SERVICEMESH.     ALL WORKS ARE PROVIDED UNDER THE APPLICABLE AGREEMENT OR 
+END USER LICENSE AGREEMENT IN EFFECT BETWEEN YOU AND SERVICEMESH.  UNLESS OTHERWISE SPECIFIED IN THE APPLICABLE AGREEMENT, 
+ALL WORKS ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, 
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.  ALL USE, DISCLOSURE AND/OR 
+REPRODUCTION OF WORKS NOT EXPRESSLY AUTHORIZED BY SERVICEMESH IS STRICTLY PROHIBITED.
+-->
+
+<xsd:schema targetNamespace="http://servicemesh.com/agility/api/activity"
+   xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="qualified"
+   xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0" jaxb:extensionBindingPrefixes="xjc annox"
+   xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+   xmlns:annox="http://annox.dev.java.net" 
+   xmlns:a="http://annox.dev.java.net/com.servicemesh.agility.tools.annotation"
+   xmlns:jl="http://annox.dev.java.net/java.lang"
+   xmlns:jxml="http://annox.dev.java.net/javax.xml.bind.annotation"
+   xmlns:activity="http://servicemesh.com/agility/api/activity">
+	
+
+  
+   <xsd:simpleType name="Category" >
+      <xsd:annotation>
+         <xsd:appinfo>
+            <annox:annotate target="class">
+               <jxml:XmlRootElement>
+                  <jxml:name>Category</jxml:name>
+               </jxml:XmlRootElement>
+               <a:ApiModel comment="{{activityCategoryDescription}}" introducedIn="1.0"/>
+            </annox:annotate>
+         </xsd:appinfo>
+      </xsd:annotation>   <xsd:restriction base="xsd:string" >
+       <xsd:enumeration value="Error" />
+       <xsd:enumeration value="Information" />
+       <xsd:enumeration value="Warning" />
+    </xsd:restriction>
+  </xsd:simpleType>
+  
+   <xsd:simpleType name="SourceType" >
+      <xsd:annotation>
+         <xsd:appinfo>
+            <annox:annotate target="class">
+               <jxml:XmlRootElement>
+                  <jxml:name>SourceType</jxml:name>
+               </jxml:XmlRootElement>
+               <a:ApiModel comment="{{activitySourceTypeDescription}}" introducedIn="1.0"/>
+            </annox:annotate>
+         </xsd:appinfo>
+      </xsd:annotation>   <xsd:restriction base="xsd:string" >
+       <xsd:enumeration value="Task" />
+       <xsd:enumeration value="Job" />
+    </xsd:restriction>
+  </xsd:simpleType>
+        
+  <xsd:complexType name="ActivityProperty">
+      <xsd:annotation>
+         <xsd:appinfo>
+            <annox:annotate target="class">
+               <jxml:XmlRootElement>
+                  <jxml:name>ActivityProperty</jxml:name>
+               </jxml:XmlRootElement>
+               <a:ApiModel comment="{{activityPropertyDescription}}" introducedIn="1.0"/>
+            </annox:annotate>
+         </xsd:appinfo>
+      </xsd:annotation>          
+      <xsd:sequence>
+            <xsd:element name="id" type="xsd:int" minOccurs="0">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{propertyID}}" systemGenerated="true"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="name" type="xsd:string">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{propertyNameDescription}}"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="value" type="xsd:string">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{propertyValueDescription}}"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="tstamp" type="xsd:long" minOccurs="0">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{propertyTstampDescription}}"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+  </xsd:complexType>
+  
+  <xsd:complexType name="ActivitySource">
+      <xsd:annotation>
+         <xsd:appinfo>
+            <annox:annotate target="class">
+               <jxml:XmlRootElement>
+                  <jxml:name>ActivitySource</jxml:name>
+               </jxml:XmlRootElement>
+               <a:ApiModel comment="{{activitySourceDescription}}" introducedIn="1.0"/>
+            </annox:annotate>
+         </xsd:appinfo>
+      </xsd:annotation>
+      <xsd:sequence>
+            <xsd:element name="id" type="xsd:int" minOccurs="0">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{activitySourceID}}" systemGenerated="true"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="sourceId" type="xsd:string" minOccurs="0">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{sourceIdDescription}}"
+                      systemGenerated="true" introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="type" type="activity:SourceType">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{activitySourceTypeDescription}}"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>       
+            <xsd:element name="name" type="xsd:string">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{activitySourceName}}"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>    
+            <xsd:element name="property" type="activity:ActivityProperty" minOccurs="0" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{activitySourcePropertiesDescription}}"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Activity">
+      <xsd:annotation>
+         <xsd:appinfo>
+            <annox:annotate target="class">
+               <jxml:XmlRootElement>
+                  <jxml:name>Activity</jxml:name>
+               </jxml:XmlRootElement>
+               <a:ApiModel comment="{{activityDescription}}" introducedIn="1.0"/>
+            </annox:annotate>
+         </xsd:appinfo>
+      </xsd:annotation>
+      <xsd:sequence>
+            <xsd:element name="id" type="xsd:int" minOccurs="0">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{activityID}}" systemGenerated="true"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="uuid" type="xsd:string" minOccurs="0">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{uuidDescription}}"
+                      systemGenerated="true" introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="category" type="activity:Category">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{activityCategoryDescription}}"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="name" type="xsd:string">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{activityName}}"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>
+           <xsd:element name="message" type="xsd:string" minOccurs="0">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{activityMessageDescription}}"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="started" type="xsd:long" minOccurs="0">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{activityStartedTstampDescription}}"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="completed" type="xsd:long" minOccurs="0">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{activityCompletedTstampDescription}}"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>
+           <xsd:element name="username" type="xsd:string" minOccurs="0">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{activityUsernameDescription}}"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="source" type="activity:ActivitySource" minOccurs="0">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{activitySourceDescription}}"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>      
+          </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="ActivityList">
+      <xsd:annotation>
+         <xsd:appinfo>
+            <annox:annotate target="class">
+               <jxml:XmlRootElement>
+                  <jxml:name>ActivityList</jxml:name>
+               </jxml:XmlRootElement>
+               <a:ApiModel comment="{{activitiesDescription}}" introducedIn="1.0"/>
+            </annox:annotate>
+         </xsd:appinfo>
+      </xsd:annotation>
+          <xsd:sequence>
+            <xsd:element name="activity" type="activity:Activity" minOccurs="0" maxOccurs="unbounded">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{activitiesDescription}}"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+          <xsd:attribute name="totalCount" type="xsd:int">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{activitiesCountDescription}}"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="skip" type="xsd:int">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{activitiesOffsetDescription}}"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="top" type="xsd:int">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{activitiesLimitDescription}}"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+          </xsd:attribute>
+  </xsd:complexType>
+
+  <xsd:complexType name="SearchCriteria">
+      <xsd:annotation>
+         <xsd:appinfo>
+            <annox:annotate target="class">
+               <jxml:XmlRootElement>
+                  <jxml:name>SearchCriteria</jxml:name>
+               </jxml:XmlRootElement>
+               <a:ApiModel comment="{{searchCriteriaDescription}}" introducedIn="1.0"/>
+            </annox:annotate>
+         </xsd:appinfo>
+      </xsd:annotation>
+          <xsd:sequence>
+            <xsd:element name="startTime" type="xsd:long" minOccurs="0">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{scStartTimeDescription}}"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="stopTime" type="xsd:long" minOccurs="0">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{scStopTimeDescription}}"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>
+		    <xsd:element name="category" type="xsd:string" minOccurs="0">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{scCategoryDescription}}"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="skip" type="xsd:int" minOccurs="0">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{scOffsetDescription}}"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="top" type="xsd:int" minOccurs="0">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{scLimitDescription}}"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="orderby" type="xsd:string" minOccurs="0">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{scOrderByDescription}}"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="filter" type="xsd:string" minOccurs="0">
+              <xsd:annotation>
+                <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="{{scFilterDescription}}"
+                      introducedIn="1.0"/>
+                  </annox:annotate>
+                </xsd:appinfo>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,4 @@
+s/protected/public/
+s/private/public/
+s/public class Activity /public class Activity implements java.io.Serializable /
+s/public class ActivitySource /public class ActivitySource implements java.io.Serializable /

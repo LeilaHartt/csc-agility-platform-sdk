@@ -20,6 +20,7 @@ REPRODUCTION OF WORKS NOT EXPRESSLY AUTHORIZED BY SERVICEMESH IS STRICTLY PROHIB
    xmlns:jl="http://annox.dev.java.net/java.lang"
    xmlns:jxml="http://annox.dev.java.net/javax.xml.bind.annotation"
    xmlns:agility="http://servicemesh.com/agility/api"
+   xmlns:activity="http://servicemesh.com/agility/api/activity"
    xmlns:core="http://servicemesh.com/core/messaging">
 
    <xsd:include schemaLocation="asset.xsd" />
@@ -27,6 +28,7 @@ REPRODUCTION OF WORKS NOT EXPRESSLY AUTHORIZED BY SERVICEMESH IS STRICTLY PROHIB
    <xsd:include schemaLocation="instance.xsd" />
    <xsd:include schemaLocation="storage.xsd" />
    <xsd:include schemaLocation="property.xsd" />
+   <xsd:import namespace="http://servicemesh.com/agility/api/activity" schemaLocation="activity.xsd"/>
    <xsd:import namespace="http://servicemesh.com/core/messaging" schemaLocation="core.xsd"/>
 
    <xsd:complexType name="ApiRequest">
@@ -1222,6 +1224,38 @@ REPRODUCTION OF WORKS NOT EXPRESSLY AUTHORIZED BY SERVICEMESH IS STRICTLY PROHIB
                   </xsd:annotation>
                </xsd:element>
                
+            </xsd:sequence>
+         </xsd:extension>
+      </xsd:complexContent>
+   </xsd:complexType>
+   
+   <xsd:complexType name="ActivityMessageRequest">
+      <xsd:annotation>
+         <xsd:appinfo>
+            <annox:annotate target="class">
+               <jxml:XmlRootElement>
+                  <jxml:name>ActivityMessageRequest</jxml:name>
+               </jxml:XmlRootElement>
+               <a:ApiModel comment = "Message to generate an Activity message"
+                           description = "" 
+                           externalDocLink = ""
+                           introducedIn = "3.2" />
+            </annox:annotate>
+         </xsd:appinfo>
+      </xsd:annotation>
+      <xsd:complexContent>
+         <xsd:extension base="agility:ApiRequest">
+            <xsd:sequence>
+               <xsd:element name="activity" type="activity:Activity" minOccurs="1">
+                  <xsd:annotation>
+                     <xsd:appinfo>
+                        <annox:annotate target="field">
+                           <a:ApiField comment="Activity message information" />
+                        </annox:annotate>
+                     </xsd:appinfo>
+                  </xsd:annotation>
+               </xsd:element>
+              
             </xsd:sequence>
          </xsd:extension>
       </xsd:complexContent>

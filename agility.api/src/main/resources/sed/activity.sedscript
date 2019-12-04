@@ -1,0 +1,2 @@
+s/public List<ActivityProperty> getProperties() {/public void setProperties(List<ActivityProperty> p) { properties=p; } \
+    public List<ActivityProperty> getProperties() {/
