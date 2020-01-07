@@ -7,9 +7,6 @@ package com.servicemesh.agility.api.service;
 
 import com.servicemesh.agility.api.User;
 
-/**
- * @author akofman
- */
 public interface IUser
 {
     /**
@@ -21,4 +18,13 @@ public interface IUser
      *             thrown if not allowed to view the specified user or user doesn't exist
      */
     public boolean isAdmin(User user) throws Exception;
+
+    /**
+     * Reset user password
+     *
+     * @param user
+     * @param oldpassword
+     * @param newpassword
+     */
+    public void resetPassword(User user, String oldpassword, String newpassword) throws Exception;
 }

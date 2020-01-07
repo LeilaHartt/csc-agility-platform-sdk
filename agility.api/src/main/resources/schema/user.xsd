@@ -178,4 +178,44 @@ REPRODUCTION OF WORKS NOT EXPRESSLY AUTHORIZED BY SERVICEMESH IS STRICTLY PROHIB
       </xsd:complexContent>
    </xsd:complexType>
    
+   
+   <xsd:complexType name="PasswordRequest">
+      <xsd:annotation>
+         <xsd:appinfo>
+            <annox:annotate target="class">
+               <jxml:XmlRootElement>
+                  <jxml:name>PasswordRequest</jxml:name>
+               </jxml:XmlRootElement>
+               <a:ApiModel comment = "A structure to request a password change" 
+                           description = "This structure contains the old password and the new password.  The old password must still work prior to the change." 
+                           externalDocLink = "" />
+            </annox:annotate>
+         </xsd:appinfo>
+      </xsd:annotation>
+      
+      <xsd:sequence>
+         <xsd:element name="oldPassword" type="xsd:string" minOccurs="1" maxOccurs="1">
+            <xsd:annotation>
+               <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="Old user password" />
+                  </annox:annotate>
+               </xsd:appinfo>
+            </xsd:annotation>
+         </xsd:element>
+         
+         <xsd:element name="newPassword" type="xsd:string" minOccurs="1" maxOccurs="1">
+            <xsd:annotation>
+               <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="New user password" />
+                  </annox:annotate>
+               </xsd:appinfo>
+            </xsd:annotation>
+         </xsd:element>
+         
+      </xsd:sequence>
+   </xsd:complexType>
+   
+   
 </xsd:schema>
