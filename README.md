@@ -28,3 +28,6 @@ For more information, see [the Wiki](https://github.com/csc/csc-agility-platform
 
 ## License
 All of the code provided in this repository is licensed under the Apache Licence, Version 2.0. See [LICENSE](https://github.com/csc/csc-agility-platform-sdk/blob/master/LICENSE) for the full license text.
+
+## Branching Information
+Use the script found here to create a branch: [Branching](https://github.com/ServiceMesh/jenkins-admin-scripts/blob/master/github-branching/release-branching/11x/csc-agility-platform-sdk.sh)
