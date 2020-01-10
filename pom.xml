@@ -7,7 +7,7 @@
 	<groupId>com.servicemesh</groupId>
 	<artifactId>agility.platform-sdk</artifactId>
 	<packaging>pom</packaging>
-	<version>11.3.3.1002</version>
+	<version>11.3.3.1003-SNAPSHOT</version>
 	<name>agility.platform-sdk</name>
 
 	<modules>
