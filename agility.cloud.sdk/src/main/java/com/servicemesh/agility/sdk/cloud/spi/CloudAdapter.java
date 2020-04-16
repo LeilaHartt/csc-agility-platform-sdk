@@ -635,6 +635,12 @@ public abstract class CloudAdapter implements BundleActivator
         {
             _asyncTracker.close();
         }
+
+        //  Shutdown the worker thread:
+        if (_service != null && _service.getReactor() != null)
+        {
+            _service.getReactor().shutdown();
+        }
     }
 
     public ICancellable timerCreateRel(long interval, TimerHandler handler)

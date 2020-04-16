@@ -6,7 +6,9 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
@@ -33,6 +35,10 @@ import com.servicemesh.agility.sdk.service.msgs.ConnectionPostUpdateRequest;
 import com.servicemesh.agility.sdk.service.msgs.ConnectionPreCreateRequest;
 import com.servicemesh.agility.sdk.service.msgs.ConnectionPreDeleteRequest;
 import com.servicemesh.agility.sdk.service.msgs.ConnectionPreUpdateRequest;
+import com.servicemesh.agility.sdk.service.msgs.DownloadArtifactRequest;
+import com.servicemesh.agility.sdk.service.msgs.DownloadArtifactResponse;
+import com.servicemesh.agility.sdk.service.msgs.GetAllArtifactsRequest;
+import com.servicemesh.agility.sdk.service.msgs.GetAllArtifactsResponse;
 import com.servicemesh.agility.sdk.service.msgs.InstancePostBootRequest;
 import com.servicemesh.agility.sdk.service.msgs.InstancePostProvisionRequest;
 import com.servicemesh.agility.sdk.service.msgs.InstancePostReconfigureRequest;
@@ -107,10 +113,6 @@ import com.servicemesh.core.messaging.Status;
 import com.servicemesh.core.reactor.Reactor;
 import com.servicemesh.io.proxy.Proxy;
 import com.servicemesh.io.proxy.ProxyType;
-import com.servicemesh.agility.sdk.service.msgs.DownloadArtifactRequest;
-import com.servicemesh.agility.sdk.service.msgs.DownloadArtifactResponse;
-import com.servicemesh.agility.sdk.service.msgs.GetAllArtifactsRequest;
-import com.servicemesh.agility.sdk.service.msgs.GetAllArtifactsResponse;
 
 /**
  * The base class for a service adapter
@@ -123,9 +125,10 @@ public abstract class ServiceAdapter implements BundleActivator
     protected AsyncService _service;
     protected ServiceTracker _asyncTracker;
     protected BundleContext _context;
-    private Map<String, IValueProvider> _providers = new HashMap<String, IValueProvider>();
-    private Map<String, IMethod> _methods = new HashMap<String, IMethod>();
+    private Map<String, IValueProvider> _providers = new HashMap<>();
+    private Map<String, IMethod> _methods = new HashMap<>();
     private ServiceRegistry _registry;
+    private static long LOG_POLL_DELAY_MS = 10000L;
 
     public ServiceAdapter(Reactor reactor)
     {
@@ -240,7 +243,7 @@ public abstract class ServiceAdapter implements BundleActivator
     {
 
         //  Get the proxies specified by the usage type requested
-        List<Proxy> proxies = new ArrayList<Proxy>();
+        List<Proxy> proxies = new ArrayList<>();
 
         if (request.getClouds() == null || request.getClouds().isEmpty())
         {
@@ -373,7 +376,7 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public List<Asset> invoke(List<ApiResponse> responses)
             {
-                List<Asset> assets = new ArrayList<Asset>();
+                List<Asset> assets = new ArrayList<>();
                 for (ApiResponse response : responses)
                 {
                     assets.add(response.getAsset());
@@ -448,13 +451,19 @@ public abstract class ServiceAdapter implements BundleActivator
     {
         try
         {
+            String karaf_home = System.getProperty("karaf.home");
+            LogManager.resetConfiguration();
+            // the file will be watched, and automatically respect any changes
+            // without needing to restart karaf
+            PropertyConfigurator.configureAndWatch(karaf_home + "/etc/com.servicemesh.agility.logging.cfg", LOG_POLL_DELAY_MS);
+
             _context = context;
             _registry = new ServiceRegistry(_context);
 
             for (ServiceProviderType type : getServiceProviderTypes())
             {
                 // register the service
-                Hashtable<String, Object> metadata = new Hashtable<String, Object>();
+                Hashtable<String, Object> metadata = new Hashtable<>();
                 metadata.put("serviceType", "service");
                 metadata.put("serviceProviderType", type.getName());
                 metadata.put("version", Version.SDK_VERSION);
@@ -479,6 +488,12 @@ public abstract class ServiceAdapter implements BundleActivator
         if (_asyncTracker != null)
         {
             _asyncTracker.close();
+        }
+
+        //  Shutdown the worker thread:
+        if (_service != null && _service.getReactor() != null)
+        {
+            _service.getReactor().shutdown();
         }
     }
 
@@ -537,13 +552,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ServiceProviderPreCreateRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IServiceProvider operations = getServiceProviderOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.preCreate(request);
                             }
                             else
@@ -570,13 +585,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ServiceProviderPostCreateRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IServiceProvider operations = getServiceProviderOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.postCreate(request);
                             }
                             else
@@ -603,13 +618,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ServiceProviderPreUpdateRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IServiceProvider operations = getServiceProviderOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.preUpdate(request);
                             }
                             else
@@ -636,13 +651,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ServiceProviderPostUpdateRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IServiceProvider operations = getServiceProviderOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.postUpdate(request);
                             }
                             else
@@ -669,13 +684,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ServiceProviderPreDeleteRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IServiceProvider operations = getServiceProviderOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.preDelete(request);
                             }
                             else
@@ -702,13 +717,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ServiceProviderPostDeleteRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IServiceProvider operations = getServiceProviderOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.postDelete(request);
                             }
                             else
@@ -734,13 +749,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<ServiceProviderResponse> invoke(ServiceProviderSyncRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IServiceProvider operations = getServiceProviderOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.sync(request);
                     }
                     else
@@ -766,13 +781,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<ServiceProviderResponse> invoke(ServiceProviderPingRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IServiceProvider operations = getServiceProviderOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.ping(request);
                     }
                     else
@@ -799,13 +814,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ServiceProviderStartRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IServiceProvider operations = getServiceProviderOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.start(request);
                             }
                             else
@@ -831,13 +846,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<ServiceProviderResponse> invoke(ServiceProviderStopRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IServiceProvider operations = getServiceProviderOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.stop(request);
                     }
                     else
@@ -868,13 +883,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ServiceInstanceValidateRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IServiceInstance operations = getServiceInstanceOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.validate(request);
                             }
                             else
@@ -901,13 +916,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ServiceInstanceProvisionRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IServiceInstance operations = getServiceInstanceOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.provision(request);
                             }
                             else
@@ -934,13 +949,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ServiceInstanceReconfigureRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IServiceInstance operations = getServiceInstanceOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.reconfigure(request);
                             }
                             else
@@ -967,13 +982,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ServiceInstanceStartRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IServiceInstance operations = getServiceInstanceOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.start(request);
                             }
                             else
@@ -999,13 +1014,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<ServiceProviderResponse> invoke(ServiceInstanceStopRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IServiceInstance operations = getServiceInstanceOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.stop(request);
                     }
                     else
@@ -1032,13 +1047,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ServiceInstanceReleaseRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IServiceInstance operations = getServiceInstanceOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.release(request);
                             }
                             else
@@ -1065,13 +1080,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ServiceInstanceReleaseRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IServiceInstance operations = getServiceInstanceOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.release(request);
                             }
                             else
@@ -1101,13 +1116,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<ServiceProviderResponse> invoke(PostCreateRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IAssetLifecycle operations = getAssetNotificationOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.postCreate(request);
                     }
                     else
@@ -1132,13 +1147,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<ServiceProviderResponse> invoke(PostDeleteRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IAssetLifecycle operations = getAssetNotificationOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.postDelete(request);
                     }
                     else
@@ -1163,13 +1178,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<ServiceProviderResponse> invoke(PostUpdateRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IAssetLifecycle operations = getAssetNotificationOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.postUpdate(request);
                     }
                     else
@@ -1194,13 +1209,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<ServiceProviderResponse> invoke(PreCreateRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IAssetLifecycle operations = getAssetNotificationOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.preCreate(request);
                     }
                     else
@@ -1225,13 +1240,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<ServiceProviderResponse> invoke(PreUpdateRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IAssetLifecycle operations = getAssetNotificationOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.preUpdate(request);
                     }
                     else
@@ -1256,13 +1271,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<ServiceProviderResponse> invoke(PreDeleteRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IAssetLifecycle operations = getAssetNotificationOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.preDelete(request);
                     }
                     else
@@ -1291,13 +1306,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<InstanceResponse> invoke(InstancePreProvisionRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IInstanceLifecycle operations = getInstanceOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.preProvision(request);
                     }
                     else
@@ -1322,13 +1337,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<InstanceResponse> invoke(InstancePostProvisionRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IInstanceLifecycle operations = getInstanceOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.postProvision(request);
                     }
                     else
@@ -1353,13 +1368,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<InstanceResponse> invoke(InstancePreBootRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IInstanceLifecycle operations = getInstanceOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.preBoot(request);
                     }
                     else
@@ -1384,13 +1399,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<InstanceResponse> invoke(InstancePostBootRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IInstanceLifecycle operations = getInstanceOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.postBoot(request);
                     }
                     else
@@ -1415,13 +1430,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<InstanceResponse> invoke(InstancePreStartRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IInstanceLifecycle operations = getInstanceOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.preStart(request);
                     }
                     else
@@ -1446,13 +1461,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<InstanceResponse> invoke(InstancePostStartRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IInstanceLifecycle operations = getInstanceOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.postStart(request);
                     }
                     else
@@ -1477,13 +1492,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<InstanceResponse> invoke(InstancePreStopRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IInstanceLifecycle operations = getInstanceOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.preStop(request);
                     }
                     else
@@ -1508,13 +1523,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<InstanceResponse> invoke(InstancePostStopRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IInstanceLifecycle operations = getInstanceOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.postStop(request);
                     }
                     else
@@ -1539,13 +1554,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<InstanceResponse> invoke(InstancePreRestartRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IInstanceLifecycle operations = getInstanceOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.preRestart(request);
                     }
                     else
@@ -1570,13 +1585,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<InstanceResponse> invoke(InstancePostRestartRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IInstanceLifecycle operations = getInstanceOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.postRestart(request);
                     }
                     else
@@ -1601,13 +1616,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<InstanceResponse> invoke(InstancePreReleaseRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IInstanceLifecycle operations = getInstanceOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.preRelease(request);
                     }
                     else
@@ -1632,13 +1647,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<InstanceResponse> invoke(InstancePostReleaseRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IInstanceLifecycle operations = getInstanceOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.postRelease(request);
                     }
                     else
@@ -1663,13 +1678,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<InstanceResponse> invoke(InstancePreReconfigureRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IInstanceLifecycle operations = getInstanceOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.preReconfigure(request);
                     }
                     else
@@ -1694,13 +1709,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<InstanceResponse> invoke(InstancePostReconfigureRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IInstanceLifecycle operations = getInstanceOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.postReconfigure(request);
                     }
                     else
@@ -1730,13 +1745,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ServiceInstancePreProvisionRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IServiceInstanceLifecycle operations = getServiceInstanceLifecycleOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.preProvision(request);
                             }
                             else
@@ -1762,13 +1777,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ServiceInstancePostProvisionRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IServiceInstanceLifecycle operations = getServiceInstanceLifecycleOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.postProvision(request);
                             }
                             else
@@ -1794,13 +1809,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ServiceInstancePreStartRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IServiceInstanceLifecycle operations = getServiceInstanceLifecycleOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.preStart(request);
                             }
                             else
@@ -1826,13 +1841,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ServiceInstancePostStartRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IServiceInstanceLifecycle operations = getServiceInstanceLifecycleOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.postStart(request);
                             }
                             else
@@ -1858,13 +1873,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ServiceInstancePreStopRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IServiceInstanceLifecycle operations = getServiceInstanceLifecycleOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.preStop(request);
                             }
                             else
@@ -1890,13 +1905,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ServiceInstancePostStopRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IServiceInstanceLifecycle operations = getServiceInstanceLifecycleOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.postStop(request);
                             }
                             else
@@ -1922,13 +1937,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ServiceInstancePreRestartRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IServiceInstanceLifecycle operations = getServiceInstanceLifecycleOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.preRestart(request);
                             }
                             else
@@ -1954,13 +1969,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ServiceInstancePostRestartRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IServiceInstanceLifecycle operations = getServiceInstanceLifecycleOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.postRestart(request);
                             }
                             else
@@ -1986,13 +2001,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ServiceInstancePreReleaseRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IServiceInstanceLifecycle operations = getServiceInstanceLifecycleOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.preRelease(request);
                             }
                             else
@@ -2018,13 +2033,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ServiceInstancePostReleaseRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IServiceInstanceLifecycle operations = getServiceInstanceLifecycleOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.postRelease(request);
                             }
                             else
@@ -2053,13 +2068,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<AvailableAddressesResponse> invoke(AvailableAddressesRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IAddressManagement operations = getAddressManagementOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.getAvailableAddresses(request);
                     }
                     else
@@ -2085,13 +2100,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<ReserveAddressResponse> invoke(ReserveAddressRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IAddressManagement operations = getAddressManagementOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.reserveAddress(request);
                     }
                     else
@@ -2117,13 +2132,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<UnreserveAddressResponse> invoke(UnreserveAddressRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IAddressManagement operations = getAddressManagementOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.unreserveAddress(request);
                     }
                     else
@@ -2149,13 +2164,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<ReleaseAddressResponse> invoke(ReleaseAddressRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IAddressManagement operations = getAddressManagementOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.releaseAddress(request);
                     }
                     else
@@ -2185,13 +2200,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<ServiceProviderResponse> invoke(ConnectionPreCreateRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IConnection operations = getConnectionOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.preCreate(request);
                     }
                     else
@@ -2217,13 +2232,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ConnectionPostCreateRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IConnection operations = getConnectionOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.postCreate(request);
                             }
                             else
@@ -2248,13 +2263,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<ServiceProviderResponse> invoke(ConnectionPreUpdateRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IConnection operations = getConnectionOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.preUpdate(request);
                     }
                     else
@@ -2280,13 +2295,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ConnectionPostUpdateRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IConnection operations = getConnectionOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.postUpdate(request);
                             }
                             else
@@ -2311,13 +2326,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<ServiceProviderResponse> invoke(ConnectionPreDeleteRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IConnection operations = getConnectionOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.preDelete(request);
                     }
                     else
@@ -2343,13 +2358,13 @@ public abstract class ServiceAdapter implements BundleActivator
                     @Override
                     public Promise<ServiceProviderResponse> invoke(ConnectionPostDeleteRequest request)
                     {
-                    	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         try
                         {
                             IConnection operations = getConnectionOperations();
                             if (operations != null)
                             {
-                            	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                                Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                                 return operations.postDelete(request);
                             }
                             else
@@ -2378,13 +2393,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<PropertyTypeValueResponse> invoke(PropertyTypeValueRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IValueProvider provider = getValueProvider(request.getValueProvider());
                     if (provider != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(provider.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(provider.getClass().getClassLoader());
                         return provider.getRootValues(request);
                     }
                     else
@@ -2414,13 +2429,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<MethodResponse> invoke(MethodRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IMethod imethod = getMethod(request.getName());
                     if (imethod != null)
                     {
-                        Map<String, MethodVariable> arguments = new HashMap<String, MethodVariable>();
+                        Map<String, MethodVariable> arguments = new HashMap<>();
                         for (MethodVariable arg : request.getArguments())
                         {
                             arguments.put(arg.getName(), arg);
@@ -2452,13 +2467,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<GetAllArtifactsResponse> invoke(GetAllArtifactsRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IArtifactRepositoryManagement operations = getArtifactRepositoryManagementOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.getAllArtifacts(request);
                     }
                     else
@@ -2485,13 +2500,13 @@ public abstract class ServiceAdapter implements BundleActivator
             @Override
             public Promise<DownloadArtifactResponse> invoke(DownloadArtifactRequest request)
             {
-            	ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 try
                 {
                     IArtifactRepositoryManagement operations = getArtifactRepositoryManagementOperations();
                     if (operations != null)
                     {
-                    	Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
+                        Thread.currentThread().setContextClassLoader(operations.getClass().getClassLoader());
                         return operations.downloadArtifacts(request);
                     }
                     else
