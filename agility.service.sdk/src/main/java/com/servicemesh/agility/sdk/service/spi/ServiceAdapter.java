@@ -6,9 +6,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
@@ -451,11 +449,13 @@ public abstract class ServiceAdapter implements BundleActivator
     {
         try
         {
+            /*  Probably not needed:
             String karaf_home = System.getProperty("karaf.home");
             LogManager.resetConfiguration();
             // the file will be watched, and automatically respect any changes
             // without needing to restart karaf
             PropertyConfigurator.configureAndWatch(karaf_home + "/etc/com.servicemesh.agility.logging.cfg", LOG_POLL_DELAY_MS);
+            */
 
             _context = context;
             _registry = new ServiceRegistry(_context);
