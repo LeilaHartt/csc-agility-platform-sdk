@@ -150,10 +150,6 @@
 								</exec>
 								<exec executable="/bin/sh">
 									<arg value="-c" />
-									<arg value="sed -f ${sed.script.dir}/fixCalendar -itmp ${xjc.generated.sources.dir}/com/servicemesh/agility/api/TaskMessage.java" />
-								</exec>
-								<exec executable="/bin/sh">
-									<arg value="-c" />
 									<arg value="sed -f ${sed.script.dir}/fixCalendar -itmp ${xjc.generated.sources.dir}/com/servicemesh/agility/api/UserTask.java" />
 								</exec>
 								<exec executable="/bin/sh">
@@ -237,10 +233,6 @@
 									<arg value="-c" />
 									<arg value="sed -f ${sed.script.dir}/activity.serial -itmp ${xjc.generated.sources.dir}/com/servicemesh/agility/api/activity/*.java" />
 								</exec>
-								<exec executable="/bin/sh">
-							        <arg value="-c" />
-							        <arg value="sed -f ${sed.script.dir}/fixCalendar -itmp ${xjc.generated.sources.dir}/com/servicemesh/agility/api/activity/ActivityMessage.java" />
-							    </exec>
 								<!--  End of Activity -->
 
 								<delete>
