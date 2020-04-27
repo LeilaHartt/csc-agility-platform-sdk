@@ -2,11 +2,12 @@ package com.servicemesh.agility.api.service;
 
 import java.util.List;
 
+import com.servicemesh.agility.api.LaunchItemDeployment;
 import com.servicemesh.agility.api.Task;
 import com.servicemesh.agility.api.Template;
 import com.servicemesh.agility.api.Topology;
+import com.servicemesh.agility.api.TopologyDeployment;
 import com.servicemesh.agility.api.TopologyStats;
-import com.servicemesh.agility.api.LaunchItemDeployment;
 
 public interface ITopology<T>
 {
@@ -15,7 +16,7 @@ public interface ITopology<T>
 
     /**
      * Returns the templates associated to the specified topology.
-     * 
+     *
      * @param topology
      * @throws Exception
      */
@@ -23,7 +24,7 @@ public interface ITopology<T>
 
     /**
      * Request to delete a topology.
-     * 
+     *
      * @param parentTask
      *            Parent task of the delete request
      * @param topology
@@ -37,7 +38,7 @@ public interface ITopology<T>
 
     /**
      * Finalizes the delete request of a Topology. To be used only when all templates associated to a topology have been deleted.
-     * 
+     *
      * @param parentTask
      *            Parent task of the delete request
      * @param topology
@@ -49,11 +50,21 @@ public interface ITopology<T>
     public void finalizeDelete(Task parentTask, Topology topology, boolean isParentContext) throws Exception;
 
     /**
-     * For a given topology object, the associated LaunchItemDeployment will be returned.  If none exists, null will be returned.
+     * For a given topology object, the associated LaunchItemDeployment will be returned. If none exists, null will be returned.
      *
-     * @param topology - topology object from which to get the LaunchItemDeploymnet
+     * @param topology
+     *            - topology object from which to get the LaunchItemDeploymnet
      * @throws Exception
      */
     public LaunchItemDeployment getLaunchItemDeployment(Topology topology) throws Exception;
+
+    /**
+     * For a given topology object,all the associated Deployment will be returned. If none exists, null will be returned.
+     *
+     * @param topology
+     *            - topology object from which to get the LaunchItemDeploymnet
+     * @throws Exception
+     */
+    public TopologyDeployment getTopologyDeployment(Topology topology) throws Exception;
 
 }
