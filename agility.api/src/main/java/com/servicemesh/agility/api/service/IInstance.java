@@ -15,6 +15,7 @@ import com.servicemesh.agility.api.AssetProperty;
 import com.servicemesh.agility.api.Cloud;
 import com.servicemesh.agility.api.ConfigurationResource;
 import com.servicemesh.agility.api.Instance;
+import com.servicemesh.agility.api.Policy;
 import com.servicemesh.agility.api.Script;
 import com.servicemesh.agility.api.ScriptStatus;
 import com.servicemesh.agility.api.Snapshot;
@@ -51,13 +52,16 @@ public interface IInstance
      * @throws Exception
      */
     public Task executeScriptTask(Instance instance, Script script) throws Exception;
-    
+
     /**
      * Executes the specified script on a running virtual machine instance.
      *
-     * @param instance The target instance
-     * @param script The script to be executed
-     * @param variables A list of variables set by the user
+     * @param instance
+     *            The target instance
+     * @param script
+     *            The script to be executed
+     * @param variables
+     *            A list of variables set by the user
      * @return Returns a task that can be monitored by the caller.
      * @throws Exception
      */
@@ -464,7 +468,7 @@ public interface IInstance
      * @throws Exception
      */
     public List<Task> snapshotAllVolumes(Instance instance) throws Exception;
-	
+
     /**
      * Get all volume storages available for attachment to an instance
      *
@@ -476,4 +480,33 @@ public interface IInstance
      * @throws Exception
      */
     public List<VolumeStorage> getAvailableVolumes(int instanceId, Context context) throws Exception;
+
+    /**
+     * Add a script status to an Instance. This is intended to be called by policies that run against the Instance so that
+     * information about the execution of the policy can be shown in the UI.
+     *
+     * @param instance
+     *            The target Instance
+     * @param script
+     *            The script that was executed (optional)
+     * @param scriptStatus
+     *            The script status that is to be added
+     * @throws Exception
+     */
+    public void addScriptStatus(Instance instance, Script script, ScriptStatus scriptStatus) throws Exception;
+
+    /**
+     * Add a script status to an Instance. This is intended to be called by policies that run against the Instance so that
+     * information about the execution of the policy can be shown in the UI.
+     *
+     * @param instance
+     *            The target Instance
+     * @param policy
+     *            The policy that was executed (optional)
+     * @param scriptStatus
+     *            The script status that is to be added
+     * @throws Exception
+     */
+    public void addPolicyStatus(Instance instance, Policy policy, ScriptStatus scriptStauts) throws Exception;
+
 }
