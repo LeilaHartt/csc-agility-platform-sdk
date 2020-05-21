@@ -277,7 +277,17 @@ REPRODUCTION OF WORKS NOT EXPRESSLY AUTHORIZED BY SERVICEMESH IS STRICTLY PROHIB
                   </annox:annotate>
                 </xsd:appinfo>
               </xsd:annotation>
-            </xsd:element>      
+            </xsd:element>   
+            <xsd:element name="messages" type="activity:ActivityMessage" minOccurs="0" maxOccurs="unbounded">
+               <xsd:annotation>
+                  <xsd:appinfo>
+                     <annox:annotate target="field">
+                        <a:ApiField comment="List of messages for this Activity"
+                          introducedIn="3.2"/>
+                     </annox:annotate>
+                  </xsd:appinfo>
+               </xsd:annotation>
+            </xsd:element>   
           </xsd:sequence>
   </xsd:complexType>
 
@@ -420,4 +430,69 @@ REPRODUCTION OF WORKS NOT EXPRESSLY AUTHORIZED BY SERVICEMESH IS STRICTLY PROHIB
             </xsd:element>
           </xsd:sequence>
   </xsd:complexType>
-</xsd:schema>
+
+
+   <!--  Represents a single step/message in a Task -->
+   <xsd:complexType name="ActivityMessage">
+      <xsd:annotation>
+         <xsd:appinfo>
+            <annox:annotate target="class">
+               <jxml:XmlRootElement>
+                  <jxml:name>ActivityMessage</jxml:name>
+               </jxml:XmlRootElement>
+               <a:ApiModel comment = "A ActivityMessage holds the message for one step of an Activity" 
+                           description = "An Activity can issue several messages while the Activity runs.  An ActivityMessage will be one of these updates." 
+                           externalDocLink = "" />
+            </annox:annotate>
+         </xsd:appinfo>
+      </xsd:annotation>
+      <xsd:sequence>
+      
+         <xsd:element name="id" type="xsd:int" minOccurs="0">
+           <xsd:annotation>
+             <xsd:appinfo>
+               <annox:annotate target="field">
+                  <a:ApiField comment="Activity Message ID" systemGenerated="true"
+                   introducedIn="3.2"/>
+               </annox:annotate>
+             </xsd:appinfo>
+           </xsd:annotation>
+         </xsd:element>
+         
+         <xsd:element name="activityId" type="xsd:int" minOccurs="0">
+           <xsd:annotation>
+             <xsd:appinfo>
+               <annox:annotate target="field">
+                  <a:ApiField comment="Id of Activity what issued this message" systemGenerated="true"
+                   introducedIn="3.2"/>
+               </annox:annotate>
+             </xsd:appinfo>
+           </xsd:annotation>
+         </xsd:element>
+         
+         <xsd:element name="message" type="xsd:string" minOccurs="0">
+            <xsd:annotation>
+               <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="The message issues by the Activity" />
+                  </annox:annotate>
+               </xsd:appinfo>
+            </xsd:annotation>
+         </xsd:element>
+         
+         <xsd:element name="messageTime" type="xsd:dateTime" minOccurs="0">
+			<xsd:annotation>
+               <xsd:appinfo>
+                  <annox:annotate target="field">
+                     <a:ApiField comment="The time the message was issued"
+                     		introducedIn="3.2"
+                     		systemGenerated="true" />
+                  </annox:annotate>
+               </xsd:appinfo>
+            </xsd:annotation>
+         </xsd:element>
+         
+      </xsd:sequence>
+   </xsd:complexType>      
+   
+   </xsd:schema>
