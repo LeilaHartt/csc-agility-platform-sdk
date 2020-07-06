@@ -6,6 +6,7 @@
 package com.servicemesh.agility.api.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.servicemesh.agility.api.Link;
 import com.servicemesh.agility.api.Policy;
@@ -28,7 +29,7 @@ public interface IPolicyExecution<T>
      * @return A task handle that can be polled for task completion.
      * @throws Exception
      */
-    public Task executePolicy(Task parent, T object, Policy policy) throws Exception;
+    public Task executePolicy(Task parent, T object, Policy policy, Map<String, String> optionalPayload) throws Exception;
 
     /**
      * Indicates if policy execution is applicable for the specified asset.
@@ -65,4 +66,5 @@ public interface IPolicyExecution<T>
      * @throws Exception
      */
     public List<Link> getAnyOrderForPolicy(T object, Policy policy) throws Exception;
+
 }
